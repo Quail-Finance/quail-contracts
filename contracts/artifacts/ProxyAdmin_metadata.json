@@ -1,0 +1,100 @@
+{
+	"compiler": {
+		"version": "0.8.23+commit.f704f362"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "initialOwner",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "proxyAddress",
+						"type": "address"
+					}
+				],
+				"name": "setProxy",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newImplementation",
+						"type": "address"
+					}
+				],
+				"name": "upgrade",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/proxyAdmin.sol": "ProxyAdmin"
+		},
+		"evmVersion": "shanghai",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": [
+			":ds-test/=lib/forge-std/lib/ds-test/src/",
+			":forge-std/=lib/forge-std/src/"
+		],
+		"viaIR": true
+	},
+	"sources": {
+		"contracts/proxyAdmin.sol": {
+			"keccak256": "0xcda412c3015dffacac665d9b3ffac6cc8980d5d630bcb9f866d0cfddc684d2a6",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6f803dcc533d6bc786d32564d639644844143c8127a87ada586c6aa44f9d35c7",
+				"dweb:/ipfs/QmQcs4fwQ6QjENjtzAnvukyvxAktoiGYP6G3ZHf53VjdUK"
+			]
+		}
+	},
+	"version": 1
+}

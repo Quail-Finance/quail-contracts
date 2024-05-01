@@ -1,0 +1,10 @@
+.deps/
+.states/
+foundary-quail/
+cache/
+lib/
+.deps/
+.states/
+node_modules/
+.env
+foundry.toml
