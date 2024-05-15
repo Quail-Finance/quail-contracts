@@ -1,16 +1,10 @@
-
 {
-	"language": "Solidity",
-	"settings": {
-		"optimizer": {
-			"enabled": true,
-			"runs": 200
-		},
-		"outputSelection": {
-			"*": {
-			"": ["ast"],
-			"*": ["abi", "metadata", "devdoc", "userdoc", "storageLayout", "evm.legacyAssembly", "evm.bytecode", "evm.deployedBytecode", "evm.methodIdentifiers", "evm.gasEstimates", "evm.assembly"]
-			}
-		}
-	}
+  "Compiler Version": "0.8.17+commit.8df45f5f",
+  "Optimizer Enabled": true,
+  "Optimizer Runs": 200,
+  "Enable viaIR": true,
+  "EVM Version": "london",
+  "Metadata": {
+    "useLiteralContent": true
+  }
 }

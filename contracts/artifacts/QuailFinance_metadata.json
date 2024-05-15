@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.23+commit.f704f362"
+		"version": "0.8.25+commit.b61c2a91"
 	},
 	"language": "Solidity",
 	"output": {
@@ -570,6 +570,19 @@
 			{
 				"inputs": [
 					{
+						"internalType": "address",
+						"name": "_entropy",
+						"type": "address"
+					}
+				],
+				"name": "initialize",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
 						"internalType": "uint256",
 						"name": "_potId",
 						"type": "uint256"
@@ -953,7 +966,7 @@
 		"compilationTarget": {
 			"contracts/QuailFinance.sol": "QuailFinance"
 		},
-		"evmVersion": "shanghai",
+		"evmVersion": "cancun",
 		"libraries": {},
 		"metadata": {
 			"bytecodeHash": "ipfs"
@@ -1066,11 +1079,11 @@
 			]
 		},
 		"contracts/QuailFinance.sol": {
-			"keccak256": "0x71964b42f02a448c55412d09f89e5bcfc1403283172b198bf8f2ea679bf33632",
+			"keccak256": "0xeae668c446d3b971f283c0bfdbabddd8d34b14a3a26dcc6dcb8dc9f9344d96ae",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://ddfc4f91ee247a3a8de9c2ad9547275a4941e337742f51f51f744ddb617cf797",
-				"dweb:/ipfs/Qmew7SveAXRDgojJf42ApRmgn7ndbXGipqtaGjXmArNa7e"
+				"bzz-raw://4fe78366a92a984894c2c1ebbd8ab1a4abb987aff0ee0508f6fb454f354471ea",
+				"dweb:/ipfs/QmccmwchLc7e479CP9BgPXcyBPa69B2npSTvjKVKU9PtcR"
 			]
 		}
 	},

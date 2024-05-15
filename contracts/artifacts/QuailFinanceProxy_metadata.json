@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.24+commit.e11b9ed9"
+		"version": "0.8.25+commit.b61c2a91"
 	},
 	"language": "Solidity",
 	"output": {
@@ -164,22 +164,18 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/proxy.sol": "QuailFinanceProxy"
+			"proxy.sol": "QuailFinanceProxy"
 		},
-		"evmVersion": "shanghai",
+		"evmVersion": "cancun",
 		"libraries": {},
 		"metadata": {
 			"bytecodeHash": "ipfs"
 		},
 		"optimizer": {
-			"enabled": true,
+			"enabled": false,
 			"runs": 200
 		},
-		"remappings": [
-			":ds-test/=lib/forge-std/lib/ds-test/src/",
-			":forge-std/=lib/forge-std/src/"
-		],
-		"viaIR": true
+		"remappings": []
 	},
 	"sources": {
 		"@openzeppelin/contracts/access/Ownable.sol": {
@@ -270,12 +266,12 @@
 				"dweb:/ipfs/QmTHiadFCSJUPpRjNegc5SahmeU8bAoY8i9Aq6tVscbcKR"
 			]
 		},
-		"contracts/proxy.sol": {
-			"keccak256": "0x7a9c43934c2f51d949895bf979a1314290e52013dc5a33f6aa9f0f2564b0d6fa",
+		"proxy.sol": {
+			"keccak256": "0xb77226ba7491385619628a5cc17f7d978db35fe76794fa1b6a14f23c4613109f",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://31eb8a7c22f3a9eedcd2df7f7acb070206fdf92123720340402032af213bb4bb",
-				"dweb:/ipfs/QmNqG3dEGoPZLuRXcpBE6vvvhwdTSHVRNFD6Y8VTqV3ADX"
+				"bzz-raw://d064af79794a3d54b0003aa6a97eeac5120de579833aa5a2319b9ad8ebd2b988",
+				"dweb:/ipfs/QmWYQP35WCbZAETZRB918Ns4FNmGvJbrvGejLZ2zBVYeCA"
 			]
 		}
 	},

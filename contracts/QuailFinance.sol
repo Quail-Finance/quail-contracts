@@ -20,7 +20,7 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
     using ECDSA for bytes32;
     bytes32 public merkleRoot; // The Merkle Root representing all valid claims
     uint256 private nextPotId = 1; // Start pot IDs at 1
-    IBlast public constant BLAST = IBlast(0x4200000000000000000000000000000000000022);
+    IBlast public constant BLAST = IBlast(0x4300000000000000000000000000000000000002);
     uint256 public totalRevenue;
     uint256 public potCreationFee;
     uint256 public totalYielDeposited;
@@ -50,6 +50,7 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
     struct Pot {
         string name;
         uint256 amount;
+        uint256 totalDepositedAmount;
         uint256 riskPoolBalance;
         uint256 useRiskPoolBalance;
         uint256 rotationCycleInSeconds;
@@ -73,20 +74,19 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
     event RotationCompleted(uint256 potId, address winner, uint256 round, uint64 sequenceNumber,bytes32 userCommitment, uint256 usedRiskPoolBalance, uint256 amount);
     event RewardClaimed(uint256 potId, address winner, uint256 amount);
 
-    IERC20Rebasing public constant USDB = IERC20Rebasing(0x4200000000000000000000000000000000000022);
-    function initialize() public initializer {
+    IERC20Rebasing public constant USDB = IERC20Rebasing(0x4300000000000000000000000000000000000003);
+    function initialize(address _entropy) public initializer {
     // constructor(address _entropy, address _entropyProvider, address adminSigner) Ownable(msg.sender){
         __Ownable_init(msg.sender);
         USDB.configure(YieldMode.CLAIMABLE); //configure claimable yield for USDB
-        usdbToken = IERC20(0x4200000000000000000000000000000000000022);
-        BLAST.configureClaimableGas();
+        usdbToken = IERC20(0x4300000000000000000000000000000000000003);
         // To do change operator address while going to mainnet
-        IBlastPoints(0x2fc95838c71e76ec69ff817983BFf17c710F34E0).configurePointsOperator(0xE4860D3973802C7C42450D7b9741921C7711D039);
+        IBlastPoints(0x2536FE9ab3F511540F2f9e2eC2A805005C3Dd800).configurePointsOperator(0xE4860D3973802C7C42450D7b9741921C7711D039);
         //0x98046Bd286715D3B0BC227Dd7a956b83D8978603
         //0x6CC14824Ea2918f5De5C2f75A9Da968ad4BD6344
         //0xE4860D3973802C7C42450D7b9741921C7711D039
-        entropy = IEntropy(0x98046Bd286715D3B0BC227Dd7a956b83D8978603);
-        entropyProvider = 0x6CC14824Ea2918f5De5C2f75A9Da968ad4BD6344;
+        entropy = IEntropy(_entropy);
+        entropyProvider = 0x52DeaA1c84233F7bb8C8A45baeDE41091c616506;
         admin = 0xE4860D3973802C7C42450D7b9741921C7711D039;
         potCreationFee = 1000000000000000;
 	}
@@ -133,6 +133,7 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
         newPot.lastRotationTime = block.timestamp;
         newPot.numParticipants = _numParticipants;
         newPot.currentRound = 1;
+        newPot.totalDepositedAmount = _amount;
         newPot.participants.push(msg.sender);
         hasJoinedPot[potId][newPot.currentRound][msg.sender] = true;
         emit PotCreated(potId, _name, msg.sender, _amount, _rotationCycleInSeconds, _interestNumerator, _interestDenominator,_numParticipants,sequenceNumber,userCommitment);
@@ -158,6 +159,7 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
         bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
         require(admin == ethSignedMessageHash.recover(signature), "Signature verification failed");
         hasJoinedPot[_potId][pot.currentRound][msg.sender] = true;
+        pot.totalDepositedAmount +=pot.amount;
         // Transfer usdb to the contract
         require(usdbToken.transferFrom(msg.sender, address(this), pot.amount), "Transfer failed");
         if (!pot.hasWon[msg.sender]){
@@ -184,14 +186,13 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
     function rotateLiquidity(uint256 _potId, bytes32 userCommitment, bytes32 userRandom, bytes32 providerRandom) external payable  {
         Pot storage pot = pots[_potId];
         // this is temporary fix
-        // require(block.timestamp >= pot.lastRotationTime + pot.rotationCycleInSeconds || pot.numParticipants == pot.participants.length+pot.winners.length, "Next rotation not yet due");
+        require(block.timestamp >= pot.lastRotationTime + pot.rotationCycleInSeconds || pot.numParticipants == pot.participants.length+pot.winners.length, "Next rotation not yet due");
         bytes32 randomNumber = entropy.reveal(entropyProvider, pot.sequenceNumber, userRandom, providerRandom);
         uint256 winnerIndex = uint256(randomNumber) % pot.participants.length;
         address winner = pot.participants[winnerIndex];
         pot.winners.push(winner);
         // Transfer usdb to the winner. This will deduct the risk percentage amount set by the creator
-        uint256 totalPotAmount = pot.participants.length * pot.amount;
-        uint256 amountAfterRevenue = deductRevenue(totalPotAmount);
+        uint256 amountAfterRevenue = deductRevenue(pot.totalDepositedAmount);
         // To-do check risk pool integration
         uint256 riskPoolBalance = calculateRiskPoolBalance(_potId,amountAfterRevenue);
         uint256 currentlyUsingRiskPoolBalance = pot.useRiskPoolBalance;
@@ -214,6 +215,7 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
         if (pot.participants.length > 0) {
             pot.currentRound++;
         }
+        pot.totalDepositedAmount = 0;
         delete pot.participants;
     }
     /*
@@ -250,7 +252,9 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
             }
             pot.participants.pop();
         }
-        
+        // to do audit 
+        require(usdbToken.transfer(msg.sender, pot.amount), "Transfer failed");
+        hasJoinedPot[_potId][pot.currentRound][msg.sender] = false;
         emit ParticipantRemoved(_potId, msg.sender);
     }
     function claimReward(uint256 _potId) external {
@@ -291,6 +295,9 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
         }
     }
 
+    function configureGas() external onlyOwner{
+        BLAST.configureClaimableGas();
+    }
     // Function to claim gas
     function claimMyContractsGas() external onlyOwner{
         BLAST.claimAllGas(address(this), msg.sender);
@@ -345,6 +352,16 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
 
     function getEntropyFee() public view returns (uint256 fee) {
         fee = entropy.getFee(entropyProvider);
+    }
+
+     function getParticipantIndex(uint256 _potId, address participant) public view returns (uint256) {
+        Pot storage pot = pots[_potId];
+        for (uint256 i = 0; i < pot.participants.length; i++) {
+            if (pot.participants[i] == participant) {
+                return i;
+            }
+        }
+        revert("Participant not found");
     }
     function getRiskPoolBalance(uint256 potId) public view returns (uint256 riskPoolBalance) {
         Pot storage pot = pots[potId];
