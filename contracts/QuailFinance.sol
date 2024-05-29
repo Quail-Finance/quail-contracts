@@ -113,6 +113,7 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
         require(_rotationCycleInSeconds > 0, "Rotation cycle must be positive");
         require(_interestDenominator > 0, "Interest denominator must be positive");
         require(_interestNumerator <= _interestDenominator, "Numerator must be less than or equal to denominator");
+        require(_amount > 0, "Deposit amount must be greater than zero");
         uint256 potId = nextPotId++;
         require(usdbToken.transferFrom(msg.sender, address(this), _amount), "Creator should deposit the initial amount");
         uint64 sequenceNumber = entropy.request{value: fee}(
@@ -185,8 +186,10 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
     */
     function rotateLiquidity(uint256 _potId, bytes32 userCommitment, bytes32 userRandom, bytes32 providerRandom) external payable  {
         Pot storage pot = pots[_potId];
+        require(pot.totalDepositedAmount > 0, "Total deposited amount must be greater than zero"); // Ensure total deposited amount is greater than zero
         // this is temporary fix
-        require(block.timestamp >= pot.lastRotationTime + pot.rotationCycleInSeconds || pot.numParticipants == pot.participants.length+pot.winners.length, "Next rotation not yet due");
+        // require(block.timestamp >= pot.lastRotationTime + pot.rotationCycleInSeconds || pot.numParticipants == pot.participants.length+pot.winners.length, "Next rotation not yet due");
+        require(block.timestamp >= pot.lastRotationTime + pot.rotationCycleInSeconds, "Next rotation not yet due");
         bytes32 randomNumber = entropy.reveal(entropyProvider, pot.sequenceNumber, userRandom, providerRandom);
         uint256 winnerIndex = uint256(randomNumber) % pot.participants.length;
         address winner = pot.participants[winnerIndex];
