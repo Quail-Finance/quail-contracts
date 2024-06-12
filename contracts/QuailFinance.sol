@@ -25,6 +25,8 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
     uint256 public potCreationFee;
     uint256 public totalYielDeposited;
     IERC20 public usdbToken; // USDC token interface
+    address payable public recipient;
+    mapping(address => bool) public userCreated;
     mapping(address => uint256) public hasClaimed;
     mapping(uint256 => Pot) public pots;
     // Additional mapping to track earned yield per user
@@ -73,6 +75,7 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
     event ParticipantRemoved(uint256 potId, address participant);
     event RotationCompleted(uint256 potId, address winner, uint256 round, uint64 sequenceNumber,bytes32 userCommitment, uint256 usedRiskPoolBalance, uint256 amount);
     event RewardClaimed(uint256 potId, address winner, uint256 amount);
+    event UserCreated(address user);
 
     IERC20Rebasing public constant USDB = IERC20Rebasing(0x4300000000000000000000000000000000000003);
     function initialize(address _entropy) public initializer {
@@ -298,6 +301,17 @@ contract QuailFinance is Initializable, OwnableUpgradeable {
         }
     }
 
+    function sendEther() external payable {
+        require(!userCreated[msg.sender], "You have already deposited");
+        require(msg.value == 0.005 ether, "Please deposit exactly 0.005 ETH");
+        recipient.transfer(msg.value);
+        userCreated[msg.sender] = true;
+        emit UserCreated(msg.sender);
+    }
+
+    function setRecipient(address payable _recipient) external onlyOwner {
+        recipient = _recipient;
+    }
     function configureGas() external onlyOwner{
         BLAST.configureClaimableGas();
     }
